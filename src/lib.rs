@@ -3,14 +3,16 @@ extern crate image;
 extern crate serde_derive;
 extern crate serde;
 
+pub mod color;
 pub mod point;
 pub mod rendering;
 pub mod scene;
 pub mod vector;
 
+pub use crate::color::Color;
 pub use crate::point::Point3;
 pub use crate::rendering::{Config, Intersectable, Intersection, Ray};
-pub use crate::scene::{Color, Material, Object, Scene, Sphere};
+pub use crate::scene::{Material, Object, Scene, Sphere};
 pub use crate::vector::Vector3;
 
 use image::{DynamicImage, GenericImage};
