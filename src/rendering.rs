@@ -36,42 +36,88 @@ impl Ray {
 }
 
 pub trait Intersectable {
-  fn intersection(&self, ray: &Ray) -> bool;
+  fn intersection(&self, ray: &Ray) -> Option<f64>;
+  fn surface_normal(&self, hit_point: &Point3) -> Vector3;
 }
 
 impl Intersectable for Object {
-  fn intersection(&self, ray: &Ray) -> bool {
+  fn intersection(&self, ray: &Ray) -> Option<f64> {
     match self {
       Object::Sphere(ref sphere) => sphere.intersection(ray),
       Object::Plane(ref plane) => plane.intersection(ray),
     }
   }
+  fn surface_normal(&self, hit_point: &Point3) -> Vector3 {
+    match self {
+      Object::Sphere(ref sphere) => sphere.surface_normal(hit_point),
+      Object::Plane(ref plane) => plane.surface_normal(hit_point),
+    }
+  }
 }
 
 impl Intersectable for Sphere {
-  fn intersection(&self, ray: &Ray) -> bool {
-    //Create a line segment between the ray origin and the center of the sphere
+  fn intersection(&self, ray: &Ray) -> Option<f64> {
     let l: Vector3 = self.center - ray.origin;
-    //Use l as a hypotenuse and find the length of the adjacent side
-    let adj2 = l.dot(&ray.direction);
-    //Find the length-squared of the opposite side
-    //This is equivalent to (but faster than) (l.length() * l.length()) - (adj2 * adj2)
-    let d2 = l.dot(&l) - (adj2 * adj2);
-    //If that length-squared is less than radius squared, the ray intersects the sphere
-    d2 < (self.radius * self.radius)
+    let adj = l.dot(&ray.direction);
+    let d2 = l.dot(&l) - (adj * adj);
+    let radius2 = self.radius * self.radius;
+    if d2 > radius2 {
+      return None;
+    }
+    let thc = (radius2 - d2).sqrt();
+    let t0 = adj - thc;
+    let t1 = adj + thc;
+
+    if t0 < 0.0 && t1 < 0.0 {
+      return None;
+    }
+
+    let distance = if t0 < t1 { t0 } else { t1 };
+    Some(distance)
+  }
+
+  fn surface_normal(&self, hit_point: &Point3) -> Vector3 {
+    (*hit_point - self.center).normalize()
   }
 }
 
 impl Intersectable for Plane {
-  fn intersection(&self, ray: &Ray) -> bool {
+  fn intersection(&self, ray: &Ray) -> Option<f64> {
     let normal = &self.normal;
     let denom = normal.dot(&ray.direction);
     if denom > 1e-6 {
       let v = self.origin - ray.origin;
       let distance = v.dot(&normal) / denom;
-      return distance >= 0.0;
+      if distance >= 0.0 {
+        return Some(distance);
+      }
     }
 
-    false
+    None
+  }
+
+  fn surface_normal(&self, _: &Point3) -> Vector3 {
+    -self.normal
+  }
+}
+
+pub struct Intersection<'a> {
+  pub distance: f64,
+  pub object: &'a Object,
+}
+
+impl<'a> Intersection<'a> {
+  pub fn new<'b>(distance: f64, object: &'b Object) -> Intersection<'b> {
+    Intersection { distance, object }
+  }
+}
+
+impl Scene {
+  pub fn trace(&self, ray: &Ray) -> Option<Intersection> {
+    self
+      .objects
+      .iter()
+      .filter_map(|s| s.intersection(ray).map(|d| Intersection::new(d, s)))
+      .min_by(|i1, i2| i1.distance.partial_cmp(&i2.distance).unwrap())
   }
 }

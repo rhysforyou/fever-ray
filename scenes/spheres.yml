@@ -1,16 +1,29 @@
+light:
+  direction: { x: -4.0, y: -10.0, z: -4.0 }
+  color: { red: 1.0, green: 1.0, blue: 1.0 }
+  intensity: 0.5
 objects:
   - type: Sphere
     center: { x: 1.0, y: 1.5, z: -4.0 }
     radius: 1.0
     material:
-      color: { red: 255, green: 100, blue: 100 }
+      color: { red: 1.0, green: 0.4, blue: 0.4 }
+      albedo: 0.58
   - type: Sphere
     center: { x: 0.0, y: 0.0, z: -5.0 }
     radius: 1.0
     material:
-      color: { red: 100, green: 255, blue: 100 }
+      color: { red: 0.4, green: 1.0, blue: 0.4 }
+      albedo: 0.58
+  - type: Sphere
+    center: { x: -2.0, y: 1.0, z: -5.0 }
+    radius: 1.5
+    material:
+      color: { red: 0.4, green: 0.4, blue: 1.0 }
+      albedo: 0.58
   - type: Plane
     origin: { x: 0.0, y: -2.0, z: 0.0 }
     normal: { x: 0.0, y: -1.0, z: 0.0 }
     material:
-      color: { red: 100, green: 100, blue: 100 }
+      color: { red: 0.4, green: 0.4, blue: 0.4 }
+      albedo: 0.58

@@ -9,73 +9,51 @@ pub mod scene;
 pub mod vector;
 
 pub use crate::point::Point3;
-pub use crate::rendering::{Config, Intersectable, Ray};
+pub use crate::rendering::{Config, Intersectable, Intersection, Ray};
 pub use crate::scene::{Color, Material, Object, Scene, Sphere};
 pub use crate::vector::Vector3;
 
-use image::{DynamicImage, GenericImage, Pixel, Rgba};
+use image::{DynamicImage, GenericImage};
 
 pub fn render(config: &Config) -> DynamicImage {
   let mut image = DynamicImage::new_rgb8(config.width, config.height);
-  let black = Rgba::from_channels(0, 0, 0, 0);
   for x in 0..config.width {
     for y in 0..config.height {
       let ray = Ray::create_prime(x, y, config);
-      let mut intersected_object = false;
+      let intersection = config.scene.trace(&ray);
+      let color = match intersection {
+        Some(ref i) => get_color(&config, &ray, &i),
+        None => Color {
+          red: 0.25,
+          green: 0.52,
+          blue: 0.95,
+        },
+      };
 
-      for object in config.scene.objects.iter() {
-        if object.intersection(&ray) {
-          image.put_pixel(x, y, to_rgba(&object.material().color));
-          intersected_object = true;
-          break;
-        }
-      }
-
-      if !intersected_object {
-        image.put_pixel(x, y, black);
-      }
+      image.put_pixel(x, y, color.to_rgba());
     }
   }
 
   image
 }
 
-fn to_rgba(color: &Color) -> Rgba<u8> {
-  Rgba::from_channels(color.red, color.green, color.blue, 0)
-}
+fn get_color(config: &Config, ray: &Ray, intersection: &Intersection) -> Color {
+  let hit_point = ray.origin + (ray.direction * intersection.distance);
+  let surface_normal = intersection.object.surface_normal(&hit_point);
+  let direction_to_light = -config.scene.light.direction;
+  let light_power =
+    (surface_normal.dot(&direction_to_light) as f32).max(0.0) * config.scene.light.intensity;
+  let light_reflected = intersection.object.material().albedo / std::f32::consts::PI;
 
-#[cfg(test)]
-mod tests {
-  use crate::*;
-  use image::{DynamicImage, GenericImageView};
-
-  #[test]
-  fn test_can_render_scene() {
-    let config = Config {
-      width: 800,
-      height: 600,
-      fov: 90.0,
-      scene: Scene {
-        objects: vec![Object::Sphere(Sphere {
-          center: Point3 {
-            x: 0.0,
-            y: 0.0,
-            z: -5.0,
-          },
-          radius: 1.0,
-          material: Material {
-            color: Color {
-              red: 100,
-              green: 255,
-              blue: 100,
-            },
-          },
-        })],
-      },
+  let color = intersection.object.material().color.clone()
+    * config.scene.light.color.clone()
+    * light_power
+    * light_reflected
+    + Color {
+      red: 0.01,
+      green: 0.01,
+      blue: 0.02,
     };
 
-    let img: DynamicImage = render(&config);
-    assert_eq!(config.width, img.width());
-    assert_eq!(config.height, img.height());
-  }
+  color.clamp()
 }
