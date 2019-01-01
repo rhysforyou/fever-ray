@@ -1,5 +1,5 @@
 use crate::point::Point3;
-use crate::scene::{Object, Scene, Sphere};
+use crate::scene::{Object, Plane, Scene, Sphere};
 use crate::vector::Vector3;
 
 pub struct Config {
@@ -36,19 +36,20 @@ impl Ray {
 }
 
 pub trait Intersectable {
-  fn intersected_by(&self, ray: &Ray) -> bool;
+  fn intersection(&self, ray: &Ray) -> bool;
 }
 
 impl Intersectable for Object {
-  fn intersected_by(&self, ray: &Ray) -> bool {
+  fn intersection(&self, ray: &Ray) -> bool {
     match self {
-      Object::Sphere(ref sphere) => sphere.intersected_by(ray),
+      Object::Sphere(ref sphere) => sphere.intersection(ray),
+      Object::Plane(ref plane) => plane.intersection(ray),
     }
   }
 }
 
 impl Intersectable for Sphere {
-  fn intersected_by(&self, ray: &Ray) -> bool {
+  fn intersection(&self, ray: &Ray) -> bool {
     //Create a line segment between the ray origin and the center of the sphere
     let l: Vector3 = self.center - ray.origin;
     //Use l as a hypotenuse and find the length of the adjacent side
@@ -58,5 +59,19 @@ impl Intersectable for Sphere {
     let d2 = l.dot(&l) - (adj2 * adj2);
     //If that length-squared is less than radius squared, the ray intersects the sphere
     d2 < (self.radius * self.radius)
+  }
+}
+
+impl Intersectable for Plane {
+  fn intersection(&self, ray: &Ray) -> bool {
+    let normal = &self.normal;
+    let denom = normal.dot(&ray.direction);
+    if denom > 1e-6 {
+      let v = self.origin - ray.origin;
+      let distance = v.dot(&normal) / denom;
+      return distance >= 0.0;
+    }
+
+    false
   }
 }

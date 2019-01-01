@@ -9,3 +9,8 @@ objects:
     radius: 1.0
     material:
       color: { red: 100, green: 255, blue: 100 }
+  - type: Plane
+    origin: { x: 0.0, y: -2.0, z: 0.0 }
+    normal: { x: 0.0, y: -1.0, z: 0.0 }
+    material:
+      color: { red: 100, green: 100, blue: 100 }

@@ -24,7 +24,7 @@ pub fn render(config: &Config) -> DynamicImage {
       let mut intersected_object = false;
 
       for object in config.scene.objects.iter() {
-        if object.intersected_by(&ray) {
+        if object.intersection(&ray) {
           image.put_pixel(x, y, to_rgba(&object.material().color));
           intersected_object = true;
           break;
