@@ -1,7 +1,7 @@
 use crate::Vector3;
 use std::ops;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[repr(C)]
 pub struct Point3 {
   pub x: f64,

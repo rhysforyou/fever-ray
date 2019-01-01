@@ -1,0 +1,11 @@
+objects:
+  - type: Sphere
+    center: { x: 1.0, y: 1.5, z: -4.0 }
+    radius: 1.0
+    material:
+      color: { red: 255, green: 100, blue: 100 }
+  - type: Sphere
+    center: { x: 0.0, y: 0.0, z: -5.0 }
+    radius: 1.0
+    material:
+      color: { red: 100, green: 255, blue: 100 }

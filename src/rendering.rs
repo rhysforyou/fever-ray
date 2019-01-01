@@ -1,4 +1,13 @@
-use crate::{Point3, Scene, Sphere, Vector3};
+use crate::point::Point3;
+use crate::scene::{Object, Scene, Sphere};
+use crate::vector::Vector3;
+
+pub struct Config {
+  pub width: u32,
+  pub height: u32,
+  pub fov: f64,
+  pub scene: Scene,
+}
 
 pub struct Ray {
   pub origin: Point3,
@@ -6,13 +15,13 @@ pub struct Ray {
 }
 
 impl Ray {
-  pub fn create_prime(x: u32, y: u32, scene: &Scene) -> Ray {
-    assert!(scene.width > scene.height);
-    let fov_adjustment = (scene.fov.to_radians() / 2.0).tan();
-    let aspect_ratio = (scene.width as f64) / (scene.height as f64);
+  pub fn create_prime(x: u32, y: u32, config: &Config) -> Ray {
+    assert!(config.width > config.height);
+    let fov_adjustment = (config.fov.to_radians() / 2.0).tan();
+    let aspect_ratio = (config.width as f64) / (config.height as f64);
     let sensor_x =
-      (((x as f64 + 0.5) / scene.width as f64) * 2.0 - 1.0) * aspect_ratio * fov_adjustment;
-    let sensor_y = 1.0 - ((y as f64 + 0.5) / scene.height as f64) * 2.0 * fov_adjustment;
+      (((x as f64 + 0.5) / config.width as f64) * 2.0 - 1.0) * aspect_ratio * fov_adjustment;
+    let sensor_y = 1.0 - ((y as f64 + 0.5) / config.height as f64) * 2.0 * fov_adjustment;
 
     Ray {
       origin: Point3::zero(),
@@ -28,6 +37,14 @@ impl Ray {
 
 pub trait Intersectable {
   fn intersected_by(&self, ray: &Ray) -> bool;
+}
+
+impl Intersectable for Object {
+  fn intersected_by(&self, ray: &Ray) -> bool {
+    match self {
+      Object::Sphere(ref sphere) => sphere.intersected_by(ray),
+    }
+  }
 }
 
 impl Intersectable for Sphere {

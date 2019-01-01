@@ -1,5 +1,7 @@
 use clap::{App, Arg};
 use fever_ray::*;
+use serde_yaml;
+use std::fs::File;
 
 // const MAX_RAY_DEPTH: usize = 3;
 
@@ -9,10 +11,16 @@ fn main() {
         .author("Rhys Powell <rhys@rpowell.me>")
         .about("A raytracer written in Rust")
         .arg(
+            Arg::with_name("scene")
+                .help("Scene description input")
+                .required(true)
+                .index(1),
+        )
+        .arg(
             Arg::with_name("image")
                 .help("Sets the output image file")
                 .required(true)
-                .index(1),
+                .index(2),
         )
         .arg(
             Arg::with_name("width")
@@ -40,6 +48,9 @@ fn main() {
         );
     let matches = app.get_matches();
 
+    let scene_path = matches.value_of("scene").unwrap();
+    let scene_file = File::open(scene_path).expect("File not found");
+
     let image_path = matches.value_of("image").unwrap();
     let image_width = matches
         .value_of("width")
@@ -57,28 +68,16 @@ fn main() {
         .parse::<f64>()
         .unwrap();
 
-    let scene = Scene {
+    let scene: Scene = serde_yaml::from_reader(scene_file).unwrap();
+
+    let config = Config {
         width: image_width,
         height: image_height,
         fov: image_fov,
-        objects: vec![Sphere {
-            center: Point3 {
-                x: 0.0,
-                y: 0.0,
-                z: -5.0,
-            },
-            radius: 1.0,
-            material: Material {
-                color: Color {
-                    red: 100,
-                    green: 255,
-                    blue: 100,
-                },
-            },
-        }],
+        scene: scene,
     };
 
-    let image = fever_ray::render(&scene);
+    let image = fever_ray::render(&config);
 
     image.save(image_path).unwrap();
 }
