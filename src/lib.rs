@@ -25,11 +25,7 @@ pub fn render(config: &Config) -> DynamicImage {
       let intersection = config.scene.trace(&ray);
       let color = match intersection {
         Some(ref i) => get_color(&config, &ray, &i),
-        None => Color {
-          red: 0.25,
-          green: 0.52,
-          blue: 0.95,
-        },
+        None => config.scene.sky.color,
       };
 
       image.put_pixel(x, y, color.to_rgba());

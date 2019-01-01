@@ -46,7 +46,13 @@ pub struct DirectionalLight {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Sky {
+  pub color: Color,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Scene {
-  pub objects: Vec<Object>,
+  pub sky: Sky,
   pub light: DirectionalLight,
+  pub objects: Vec<Object>,
 }
