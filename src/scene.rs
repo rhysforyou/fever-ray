@@ -46,6 +46,42 @@ pub struct DirectionalLight {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct AmbientLight {
+  pub color: Color,
+  pub intensity: f32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "type")]
+pub enum Light {
+  Directional(DirectionalLight),
+  Ambient(AmbientLight),
+}
+
+impl Light {
+  pub fn color(&self) -> Color {
+    match self {
+      Light::Directional(l) => l.color,
+      Light::Ambient(l) => l.color,
+    }
+  }
+
+  pub fn intensity(&self) -> f32 {
+    match self {
+      Light::Directional(l) => l.intensity,
+      Light::Ambient(l) => l.intensity,
+    }
+  }
+
+  pub fn direction(&self) -> Option<Vector3> {
+    match self {
+      Light::Directional(l) => Some(-l.direction),
+      Light::Ambient(_) => None,
+    }
+  }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Sky {
   pub color: Color,
 }
@@ -53,6 +89,6 @@ pub struct Sky {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Scene {
   pub sky: Sky,
-  pub light: DirectionalLight,
+  pub lights: Vec<Light>,
   pub objects: Vec<Object>,
 }
