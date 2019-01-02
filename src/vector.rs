@@ -16,7 +16,11 @@ impl Vector3 {
     }
 
     pub fn length(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        self.norm().sqrt()
+    }
+
+    pub fn norm(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn normalize(&self) -> Vector3 {

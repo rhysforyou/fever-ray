@@ -1,13 +1,22 @@
 sky:
   color: { red: 0.55, green: 0.745, blue: 0.84 }
 lights:
-  - type: Directional
-    direction: { "x": 0.25, "y": -1.0, "z": -1.0 }
-    color: { red: 1.0, green: 0.99, blue: 0.9 }
-    intensity: 20
+  # - type: Directional
+  #   direction: { "x": 0.25, "y": -1.0, "z": -1.0 }
+  #   color: { red: 1.0, green: 0.99, blue: 0.9 }
+  #   intensity: 20
   - type: Ambient
     color: { red: 0.1, green: 0.1, blue: 0.25 }
-    intensity: 15
+    intensity: 5
+  - type: Point
+    position: { x: -2.0, y: 10.0, z: -3.0 }
+    color: { red: 0.3, green: 0.8, blue: 0.3 }
+    intensity: 4000
+  - type: Point
+    position: { x: 0.25, y: 0, z: -2 }
+    color: { red: 0.8, green: 0.3, blue: 0.3 }
+    intensity: 1000
+
 objects:
   - type: Sphere
     center: { x: 0.0, y: 0.0, z: -5.0 }

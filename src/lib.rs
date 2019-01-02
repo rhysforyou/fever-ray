@@ -41,7 +41,7 @@ fn get_color(config: &Config, ray: &Ray, intersection: &Intersection) -> Color {
   let mut color = Color::black();
 
   for light in &config.scene.lights {
-    let direction_to_light = light.direction();
+    let direction_to_light = light.direction(&hit_point);
 
     let light_power: f32;
 
@@ -51,13 +51,18 @@ fn get_color(config: &Config, ray: &Ray, intersection: &Intersection) -> Color {
         direction: direction_to_light,
       };
       let shadow_intersection = config.scene.trace(&shadow_ray);
-      let in_light = shadow_intersection.is_none();
+      let in_light = shadow_intersection.is_none()
+        || shadow_intersection.unwrap().distance > light.distance(&hit_point);
 
-      let light_intensity = if in_light { light.intensity() } else { 0.0 };
+      let light_intensity = if in_light {
+        light.intensity(&hit_point)
+      } else {
+        0.0
+      };
 
       light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
     } else {
-      light_power = light.intensity();
+      light_power = light.intensity(&hit_point);
     }
 
     let light_reflected = intersection.object.material().albedo / std::f32::consts::PI;
