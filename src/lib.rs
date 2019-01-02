@@ -16,19 +16,32 @@ pub use crate::scene::{Material, Object, Scene, Sphere};
 pub use crate::vector::Vector3;
 
 use image::{DynamicImage, GenericImage};
+use rayon::prelude::*;
 
 pub fn render(config: &Config) -> DynamicImage {
   let mut image = DynamicImage::new_rgb8(config.width, config.height);
-  for x in 0..config.width {
-    for y in 0..config.height {
-      let ray = Ray::create_prime(x, y, config);
-      let intersection = config.scene.trace(&ray);
-      let color = intersection
-        .map(|i| get_color(&config, &ray, &i))
-        .unwrap_or(config.scene.sky.color);
 
-      image.put_pixel(x, y, color.to_rgba());
-    }
+  let samples: Vec<(u32, u32)> = (0..config.width)
+    .flat_map(move |x| (0..config.height).map(move |y| (x, y)))
+    .collect();
+
+  let pixels: Vec<(u32, u32, Color)> = samples
+    .par_iter()
+    .map(|(x, y)| {
+      let ray = Ray::create_prime(*x, *y, config);
+      let intersection = config.scene.trace(&ray);
+      (
+        *x,
+        *y,
+        intersection
+          .map(|i| get_color(&config, &ray, &i))
+          .unwrap_or(config.scene.sky.color),
+      )
+    })
+    .collect();
+
+  for (x, y, color) in pixels {
+    image.put_pixel(x, y, color.to_rgba());
   }
 
   image

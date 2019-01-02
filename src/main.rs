@@ -83,8 +83,8 @@ fn main() {
     let scene: Scene = serde_yaml::from_reader(scene_file).unwrap();
 
     let config = Config {
-        width,
-        height,
+        width: width,
+        height: height,
         fov,
         shadow_bias,
         scene,
