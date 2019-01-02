@@ -45,6 +45,13 @@ fn main() {
                 .help("The field of view of the image")
                 .default_value("90.0")
                 .required(false),
+        )
+        .arg(
+            Arg::with_name("shadow_bias")
+                .long("shadow_bias")
+                .short("s")
+                .default_value("0.0001")
+                .required(false),
         );
     let matches = app.get_matches();
 
@@ -52,29 +59,35 @@ fn main() {
     let scene_file = File::open(scene_path).expect("File not found");
 
     let image_path = matches.value_of("image").unwrap();
-    let image_width = matches
+    let width = matches
         .value_of("width")
         .unwrap_or("640")
         .parse::<u32>()
         .unwrap();
-    let image_height = matches
+    let height = matches
         .value_of("height")
         .unwrap_or("480")
         .parse::<u32>()
         .unwrap();
-    let image_fov = matches
+    let fov = matches
         .value_of("fov")
         .unwrap_or("90.0")
+        .parse::<f64>()
+        .unwrap();
+    let shadow_bias = matches
+        .value_of("shadow_bias")
+        .unwrap_or("0.0001")
         .parse::<f64>()
         .unwrap();
 
     let scene: Scene = serde_yaml::from_reader(scene_file).unwrap();
 
     let config = Config {
-        width: image_width,
-        height: image_height,
-        fov: image_fov,
-        scene: scene,
+        width,
+        height,
+        fov,
+        shadow_bias,
+        scene,
     };
 
     let image = fever_ray::render(&config);

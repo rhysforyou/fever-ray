@@ -23,10 +23,9 @@ pub fn render(config: &Config) -> DynamicImage {
     for y in 0..config.height {
       let ray = Ray::create_prime(x, y, config);
       let intersection = config.scene.trace(&ray);
-      let color = match intersection {
-        Some(ref i) => get_color(&config, &ray, &i),
-        None => config.scene.sky.color,
-      };
+      let color = intersection
+        .map(|i| get_color(&config, &ray, &i))
+        .unwrap_or(config.scene.sky.color);
 
       image.put_pixel(x, y, color.to_rgba());
     }
@@ -39,19 +38,26 @@ fn get_color(config: &Config, ray: &Ray, intersection: &Intersection) -> Color {
   let hit_point = ray.origin + (ray.direction * intersection.distance);
   let surface_normal = intersection.object.surface_normal(&hit_point);
   let direction_to_light = -config.scene.light.direction;
-  let light_power =
-    (surface_normal.dot(&direction_to_light) as f32).max(0.0) * config.scene.light.intensity;
+
+  let shadow_ray = Ray {
+    origin: hit_point + (direction_to_light * config.shadow_bias),
+    direction: direction_to_light,
+  };
+  let in_light = config.scene.trace(&shadow_ray).is_none();
+
+  let light_intensity = if in_light {
+    config.scene.light.intensity
+  } else {
+    0.0
+  };
+
+  let light_power = (surface_normal.dot(&direction_to_light) as f32).max(0.0) * light_intensity;
   let light_reflected = intersection.object.material().albedo / std::f32::consts::PI;
 
   let color = intersection.object.material().color.clone()
     * config.scene.light.color.clone()
     * light_power
-    * light_reflected
-    + Color {
-      red: 0.01,
-      green: 0.01,
-      blue: 0.02,
-    };
+    * light_reflected;
 
   color.clamp()
 }

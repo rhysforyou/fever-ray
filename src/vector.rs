@@ -1,13 +1,11 @@
 use std::ops::{Add, Mul, Neg, Sub};
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-#[repr(C)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
-
 impl Vector3 {
     pub fn zero() -> Vector3 {
         Vector3::from_one(0.0)
@@ -18,11 +16,7 @@ impl Vector3 {
     }
 
     pub fn length(&self) -> f64 {
-        self.norm().sqrt()
-    }
-
-    pub fn norm(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z)
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
     pub fn normalize(&self) -> Vector3 {

@@ -6,6 +6,7 @@ pub struct Config {
   pub width: u32,
   pub height: u32,
   pub fov: f64,
+  pub shadow_bias: f64,
   pub scene: Scene,
 }
 
@@ -43,14 +44,14 @@ pub trait Intersectable {
 impl Intersectable for Object {
   fn intersection(&self, ray: &Ray) -> Option<f64> {
     match self {
-      Object::Sphere(ref sphere) => sphere.intersection(ray),
-      Object::Plane(ref plane) => plane.intersection(ray),
+      Object::Sphere(s) => s.intersection(ray),
+      Object::Plane(p) => p.intersection(ray),
     }
   }
   fn surface_normal(&self, hit_point: &Point3) -> Vector3 {
     match self {
-      Object::Sphere(ref sphere) => sphere.surface_normal(hit_point),
-      Object::Plane(ref plane) => plane.surface_normal(hit_point),
+      Object::Sphere(s) => s.surface_normal(hit_point),
+      Object::Plane(p) => p.surface_normal(hit_point),
     }
   }
 }
@@ -92,7 +93,6 @@ impl Intersectable for Plane {
         return Some(distance);
       }
     }
-
     None
   }
 
