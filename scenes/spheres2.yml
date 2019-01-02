@@ -1,0 +1,62 @@
+sky:
+  color: { red: 0.55, green: 0.745, blue: 0.84 }
+lights:
+  - type: Directional
+    direction: { x: -0.863868, y: -0.431934, z: -0.259161 }
+    color: { red: 1.0, green: 0.99, blue: 0.9 }
+    intensity: 4
+  - type: Ambient
+    color: { red: 0.1, green: 0.1, blue: 0.25 }
+    intensity: 2
+  # - type: Point
+  #   position: { x: -2.0, y: 10.0, z: -3.0 }
+  #   color: { red: 0.3, green: 0.8, blue: 0.3 }
+  #   intensity: 3000
+  # - type: Point
+  #   position: { x: 0.25, y: 0, z: -2 }
+  #   color: { red: 0.8, green: 0.3, blue: 0.3 }
+  #   intensity: 500
+
+objects:
+  - type: Sphere
+    center: { x: 0.0, y: -1, z: -5.0 }
+    radius: 1.0
+    material:
+      color: { red: 1.0, green: 1.0, blue: 0.2 }
+      albedo: 0.50
+  - type: Sphere
+    center: { x: 3.0, y: -1, z: -4.0 }
+    radius: 1.0
+    material:
+      color: { red: 0.2, green: 1.0, blue: 0.2 }
+      albedo: 0.18
+  - type: Sphere
+    center: { x: 2.0, y: -1, z: -7.0 }
+    radius: 1.0
+    material:
+      color: { red: 0.2, green: 1.0, blue: 1.0 }
+      albedo: 0.18
+  - type: Sphere
+    center: { x: -2.0, y: -1, z: -8.0 }
+    radius: 1.0
+    material:
+      color: { red: 1.0, green: 0.2, blue: 0.2 }
+      albedo: 0.18
+  - type: Sphere
+    center: { x: -3.0, y: -1, z: -4.0 }
+    radius: 1.0
+    material:
+      color: { red: 0.2, green: 0.2, blue: 1.0 }
+      albedo: 0.18
+  - type: Sphere
+    center: { x: -5.0, y: 0, z: -10.0 }
+    radius: 2.0
+    material:
+      color: { red: 1.0, green: 0.2, blue: 1.0 }
+      albedo: 0.2
+  - type: Plane
+    origin: { x: 0.0, y: -2.0, z: 0.0 }
+    normal: { x: 0.0, y: -1.0, z: 0.0 }
+    material:
+      color: { red: 0.02, green: 0.02, blue: 0.1 }
+      albedo: 0.58

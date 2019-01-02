@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use fever_ray::*;
+use image::{imageops, FilterType};
 use serde_yaml;
 use std::fs::File;
 
@@ -83,8 +84,8 @@ fn main() {
     let scene: Scene = serde_yaml::from_reader(scene_file).unwrap();
 
     let config = Config {
-        width: width,
-        height: height,
+        width: width * 4,
+        height: height * 4,
         fov,
         shadow_bias,
         scene,
@@ -92,5 +93,7 @@ fn main() {
 
     let image = fever_ray::render(&config);
 
-    image.save(image_path).unwrap();
+    imageops::resize(&image, width, height, FilterType::CatmullRom)
+        .save(image_path)
+        .unwrap();
 }
